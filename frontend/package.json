@@ -1,0 +1,30 @@
+{
+  "name": "@petekinnecom/interfacets",
+  "version": "0.9.99",
+  "description": "Node counterpart for interfacets ruby gem",
+  "homepage": "https://github.com/petekinnecom/interfacets#readme",
+  "bugs": {
+    "url": "https://github.com/petekinnecom/interfacets/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/petekinnecom/interfacets.git"
+  },
+  "license": "MIT",
+  "author": "petekinnecom",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./core": "./src/core.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+  }
+}

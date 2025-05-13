@@ -1,0 +1,29 @@
+#! /usr/bin/env bash
+
+set -ex
+
+# Check required environment variables
+if [ -z "$GEM_HOST_API_KEY" ]; then
+  echo "Error: GEM_HOST_API_KEY environment variable is not set"
+  exit 1
+fi
+
+if [ -z "$NPM_TOKEN" ]; then
+  echo "Error: NPM_TOKEN environment variable is not set"
+  exit 1
+fi
+
+mkdir -p tmp/
+
+cd gem
+
+# Build the gem into tmp directory
+gem build interfacets.gemspec --output ../tmp/interfacets.gem
+
+# Push the gem to rubygems
+gem push ../tmp/interfacets.gem
+
+cd ../frontend
+
+# Build and push the npm package
+npm publish

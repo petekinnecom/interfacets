@@ -1,0 +1,17 @@
+{
+  "name": "sinatra-facets",
+  "version": "1.0.0",
+  "description": "Minimal Sinatra app with Interfacets",
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch"
+  },
+  "dependencies": {
+    "@petekinnecom/interfacets": "^0.9.9",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}

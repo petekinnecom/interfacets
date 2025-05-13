@@ -1,0 +1,180 @@
+AllCops:
+  NewCops: enable
+  Exclude: [ "bin/*" ]
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: true
+  EnforcedStyle: new_line
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: true
+
+Layout/MultilineMethodParameterLineBreaks:
+  Enabled: true
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true
+
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+
+Layout/ArgumentAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Style/NumberedParameters:
+  Enabled: false
+
+Style/OpenStructUse:
+  Enabled: false
+
+Lint/EmptyBlock:
+  Enabled: false
+
+Style/ExponentialNotation:
+  Enabled: false
+
+Layout/MultilineAssignmentLayout:
+  Enabled: true
+  EnforcedStyle: new_line
+
+Layout/ExtraSpacing:
+  Enabled: true
+  AllowForAlignment: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Naming/PredicateName:
+  Enabled: false
+
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
+
+Security/Eval:
+  Enabled: false
+
+Style/Alias:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+  EnforcedStyle: semantic
+
+Style/CaseLikeIf:
+  Enabled: false
+
+Style/CombinableLoops:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyLambdaParameter:
+  Enabled: false
+
+Style/EvenOdd:
+  Enabled: false
+
+
+Style/GuardClause:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Style/ModuleFunction:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/MultilineMemoization:
+  Enabled: true
+  EnforcedStyle: braces
+
+Style/ParenthesesAroundCondition:
+  Enabled: true
+  AllowInMultilineConditions: true
+
+Style/RaiseArgs:
+  Enabled: true
+  EnforcedStyle: compact
+
+Style/RedundantParentheses:
+  Enabled: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/SymbolArray:
+  Enabled: true
+  EnforcedStyle: brackets
+
+Style/TrailingCommaInArguments:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/WordArray:
+  Enabled: true
+  EnforcedStyle: brackets
+
+Layout/LineLength:
+  Max: 100
+  AllowedPatterns: ['^(\s*#)']
+
+Style/DocumentDynamicEvalDefinition:
+  Enabled: false

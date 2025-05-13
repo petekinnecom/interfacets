@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sinatra + Interfacets</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <script type="text/json" id="interfacets-client-system-json">
+    <%= settings.server_bus.client_system_json.to_json %>
+  </script>
+
+  <script type="text/json" id="interfacets-facet">
+    <%= @facet_json.to_json %>
+  </script>
+
+  <div id="main"></div>
+
+  <script src="/assets/application.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "manifest": {
+    "name": "interfacets",
+    "version": "0.0.1",
+    "description": "Node counterpart for interfacets ruby gem",
+    "homepage": "https://github.com/petekinnecom/interfacets#readme",
+    "bugs": {
+      "url": "https://github.com/petekinnecom/interfacets/issues"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/petekinnecom/interfacets.git"
+    },
+    "license": "MIT",
+    "author": {
+      "name": "petekinnecom"
+    },
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "peerDependencies": {
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    },
+    "devDependencies": {},
+    "_registry": "npm",
+    "_loc": "/home/pete/.cache/yarn/v6/npm-interfacets-0.0.1-a77499b2-ce40-4ba4-a482-1ef4468366d8-1747325996537/node_modules/interfacets/package.json"
+  },
+  "artifacts": [],
+  "remote": {
+    "type": "copy",
+    "registry": "npm",
+    "hash": "69f5ce03-bdb0-4ade-8ddb-e654f3d29048-1756138359097",
+    "reference": "/home/pete/data/dev/repos/homeserver/services/hub/libs/interfacets"
+  },
+  "registry": "npm",
+  "hash": "69f5ce03-bdb0-4ade-8ddb-e654f3d29048-1756138359097"
+}

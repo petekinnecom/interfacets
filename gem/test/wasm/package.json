@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "dependencies": {
+    "interfacets": "file:../../../frontend"
+  }
+}
