@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    interfacets (0.1.0.pre.tmp)
+    interfacets (0.9.9)
       activesupport (>= 7.0)
       zeitwerk (>= 2.5)
 

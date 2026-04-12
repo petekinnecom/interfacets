@@ -54,6 +54,7 @@ module Interfacets
             .of(block, keep_script_lines: true)
             .source
             .strip
+
         end
       end
     end

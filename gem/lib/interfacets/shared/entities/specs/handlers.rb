@@ -43,6 +43,14 @@ module Interfacets
           end
 
           class Reference < Handler
+            def collection?
+              true
+            end
+
+            def reference?
+              false
+            end
+
             def get
               wrap(entity.instance_exec(&spec.getter))
                 .tap {
@@ -70,6 +78,14 @@ module Interfacets
           end
 
           class Collection < Handler
+            def collection?
+              true
+            end
+
+            def reference?
+              false
+            end
+
             def get
               values = entity.instance_exec(&spec.getter) || []
 

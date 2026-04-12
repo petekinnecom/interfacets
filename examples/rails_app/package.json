@@ -8,7 +8,7 @@
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --alias:react=react --alias:react-dom=react-dom"
   },
   "dependencies": {
-    "interfacets": "file:../frontend",
+    "interfacets": "file:../../frontend",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }

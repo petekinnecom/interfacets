@@ -5,13 +5,41 @@ require "active_support/all"
 module Interfacets
   module Server
     class Registry
-      attr_reader :build_dir, :specs
+      class Channel
+        def initialize(registry:)
+          @registry = registry
+        end
+
+        def render_facet
+          @facet.render
+        end
+
+        def rendered?
+          @facet
+        end
+
+        def render(klass, store)
+          @facet = @registry.build(klass, store)
+        end
+      end
+
+      attr_reader :specs
+
+      # TODO: we need to have a different build dir for different
+      # test threads. How can we do that?
+      attr_accessor :build_dir
       def initialize(facets:, build_dir:)
         @build_dir = build_dir
         @specs = Array(facets)
       end
 
-      def register
+      def ensure_registered(klass)
+        register(klass:)
+      end
+
+      def register(klass: nil)
+        this = self
+
         specs
           .flat_map { _1.respond_to?(:call) ? _1.call : _1 }
           .each do |klass_or_name|
@@ -29,21 +57,25 @@ module Interfacets
             )
 
             next if registry.key?(klass.name)
+            next if klass && klass != klass
 
             shared = Class.new(Shared::Entity) do
-              klass.shareds.each { class_exec(&_1) }
+              klass.bases.each { class_exec(&_1) }
             end
 
             entity = Class.new(Shared::Entity) do
               self.manifest = shared
               role("server")
 
-              klass.shareds.each { class_exec(&_1) }
+              klass.bases.each { class_exec(&_1) }
               klass.servers.each { class_exec(&_1) }
 
-              attr_writer :channel
-              def channel
-                @channel || parent.channel
+              define_method(:channel) do
+                @channel ||= parent&.channel || Channel.new(registry: this)
+              end
+
+              define_method(:build_entity) do |*a, **p, &b|
+                this.build(*a, **p, &b)
               end
             end
 
@@ -55,8 +87,6 @@ module Interfacets
         register
         entry = registry.fetch(name.is_a?(Class) ? name.name : name)
 
-
-
         Api.new(
           registry: self,
           name:,
@@ -65,7 +95,7 @@ module Interfacets
               .fetch(:entity)
               .new(
                 store: store.is_a?(Hash) ? OpenStruct.new(store) : store,
-                nesting: ["root"],
+                nesting: "root",
                 parent: nil
               )
           )
@@ -104,7 +134,7 @@ module Interfacets
                 #{
                   entry
                     .fetch(:klass)
-                    .shareds
+                    .bases
                     .map { write_source(_1) }
                     .map { "class_exec(&#{_1})" }
                     .join("\n")
@@ -155,7 +185,7 @@ module Interfacets
                 #{
                   entry
                     .fetch(:klass)
-                    .shareds
+                    .bases
                     .map { write_source(_1) }
                     .map { "class_exec(&#{_1})" }
                     .join("\n")
@@ -172,11 +202,7 @@ module Interfacets
 
                 self.manifest = Shared
 
-                actions.each do |name, spec|
-                  if name.start_with?("after_")
-                    define_method(name) {}
-                  end
-                end
+
 
                 def channel(name)
                   Interfacets::Client::System.current_bus.channel(name).builder

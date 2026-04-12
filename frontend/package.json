@@ -16,7 +16,8 @@
   "main": "./src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./core": "./src/core.js"
+    "./core": "./src/core.js",
+    "./test": "./src/test.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

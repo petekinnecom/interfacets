@@ -44,6 +44,10 @@ module Interfacets
         c("dom")
       end
 
+      def timers
+        c("timer")
+      end
+
       private
 
       def js
@@ -51,7 +55,8 @@ module Interfacets
           js_api = Test::Js::Receivers::Api.new(name: "interfacets:api", router:)
           js_react = Test::Js::Receivers::React.new(name: "dom")
           js_url = Test::Js::Receivers::Url.new(name: "url")
-          receivers = [js_api, js_react, js_url]
+          js_timer = Test::Js::Receivers::Timer.new(name: "timer")
+          receivers = [js_api, js_react, js_url, js_timer]
 
           TYPES.fetch(type).new(
             receiver_index: receivers.map { [_1.name, _1] }.to_h,

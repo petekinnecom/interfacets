@@ -163,11 +163,13 @@ class Facets::Blogs::Show < ApplicationFacet
   # constructed using the `build` method
   # (it's the `build` method from the
   # ServerBus, see above for its API)
-  find do |id, query:|
-    build(
-      self, # the facet class to build
-      Blog.find(id) # the store
-    )
+  server_entity do
+    find do |id, query:|
+      build(
+        self, # the facet class to build
+        Blog.find(id) # the store
+      )
+    end
   end
 end
 ```
@@ -178,17 +180,19 @@ The `find` method allows us to build Facets of a different class entirely. We ca
 class Facets::Blogs::Show < ApplicationFacet
   include Interfacets::Server::BasicRoutable
 
-  find do |id, query:|
-    blog = Blog.find_by(id:)
+  server_entity do
+    find do |id, query:|
+      blog = Blog.find_by(id:)
 
-    if blog.nil? || Current.user.cannot_view?(blog)
-      build(
-        Blogs::List,
-        { error: "Blog not found" }
-      )
+      if blog.nil? || Current.user.cannot_view?(blog)
+        build(
+          Blogs::List,
+          { error: "Blog not found" }
+        )
+      end
+
+      build(self, blog)
     end
-
-    build(self, blog)
   end
 end
 ```

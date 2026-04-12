@@ -118,6 +118,18 @@ module Interfacets
             Handlers::Collection.new(entity:, spec: self)
           end
         end
+
+        class Merger
+          attr_reader(:name, :block)
+          def initialize(name:, block:)
+            @name = name
+            @block = block
+          end
+
+          def call(entity, value)
+            block.call(entity, value)
+          end
+        end
       end
     end
   end

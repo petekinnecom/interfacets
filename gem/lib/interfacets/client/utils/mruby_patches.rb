@@ -60,7 +60,7 @@ module Interfacets
 
         module StringPresence
           def blank?
-            match?(/^\s*$/)
+            !!match(/\A\s*\z/)
           end
         end
 

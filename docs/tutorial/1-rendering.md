@@ -179,7 +179,7 @@ view do |entity|
   end
 end
 
-client do
+client_entity do
   def after_save
     channel(:url).redirect("/people/list")
   end

@@ -39,39 +39,26 @@ class Bus
   end
 
   def handle(event:)
+    action = event.fetch("action")
+
     assert_valid_receiver(to: event.fetch("to"))
     assert_valid_action(
-      action: event.fetch("action"),
+      action:,
       to: entity.role,
       nesting: event.fetch("nesting"),
     )
 
     attributes = event.fetch("payload").fetch("attributes", {})
 
-    merge(entity:, manifest:, attributes:)
+    merge(entity:, manifest:, attributes:, action:)
 
-    target_entity = entity
-    event.fetch("nesting")[1..-1].each do |assoc_name, id|
-      break if target_entity.nil?
-
-      spec = entity.association(assoc_name)
-
-      target_entity =(
-        if spec.type == :reference
-          target_entity = spec.get
-        else
-          spec.get.find { _1.internal_entity_id == id }
-        end
-      )
-    end
-
-    raise "No EntityError" if target_entity.nil?
+    target_entity = entity.entity_at(event.fetch("nesting"))
 
     target_entity
-      .class
-      .actions
-      .fetch(event.fetch("action"))
-      .dispatch(target_entity)
+      &.class
+      &.actions
+      &.fetch(event.fetch("action"))
+      &.dispatch(target_entity)
   end
 
   private
@@ -110,7 +97,7 @@ class Bus
     data
   end
 
-  def merge(manifest:, entity:, attributes:)
+  def merge(manifest:, entity:, attributes:, action:)
     manifest
       .accessors
       .values
@@ -118,7 +105,19 @@ class Bus
       .each do |attribute|
         next unless attributes.key?(attribute.name)
 
-        entity.send("#{attribute.name}=", attributes[attribute.name])
+        attr_mergers = (
+          entity.class.mergers[attribute.name]
+        )
+
+        merger = (
+          if attr_mergers.key?(action)
+            attr_mergers.fetch(action)
+          else
+            attr_mergers.fetch(:default)
+          end
+        )
+
+        merger.call(entity, attributes[attribute.name])
       end
 
     manifest
@@ -144,7 +143,8 @@ class Bus
             merge(
               entity: _1,
               manifest: association.klass,
-              attributes: value
+              attributes: value,
+              action:
             )
           }
           .then { entity.association(association.name).set(_1) }
@@ -175,7 +175,8 @@ class Bus
                 merge(
                   entity: r,
                   manifest: collection.klass,
-                  attributes: val
+                  attributes: val,
+                  action:
                 )
               }
             else
@@ -186,7 +187,8 @@ class Bus
                     merge(
                       entity: r,
                       manifest: collection.klass,
-                      attributes: val
+                      attributes: val,
+                      action:
                     )
                   }
             end
@@ -198,6 +200,7 @@ class Bus
 
   def assert_valid_action(action:, to:, nesting:)
     nested_manifest = manifest
+
     nesting[1..-1].each do |assoc_name, _id|
       nested_manifest = manifest.associations.fetch(assoc_name).klass
     end

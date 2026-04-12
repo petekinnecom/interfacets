@@ -27,10 +27,10 @@ module Facets
         end
       end
 
-      client do
+      client_entity do
       end
 
-      shared do
+      entity_base do
         collection(:users) do
           accessor(:id, accepted_by: :client)
           accessor(:name, accepted_by: :client)
@@ -41,11 +41,10 @@ module Facets
         end
       end
 
-      find do |id, query:|
-        build(self, {users: User.all.to_a})
-      end
-
-      server do
+      server_entity do
+        find do |id, query:|
+          build(self, {users: User.all.to_a})
+        end
       end
     end
   end

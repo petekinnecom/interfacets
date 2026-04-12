@@ -68,10 +68,10 @@ module Facets
         end
       end
 
-      client do
+      client_entity do
       end
 
-      shared do
+      entity_base do
         accessor(:id, accepted_by: :client)
         accessor(:name)
 
@@ -88,19 +88,18 @@ module Facets
         server_action(:save)
       end
 
-      find do |id, query:|
-        user = (
-          if id == "new"
-            User.new
-          else
-            User.find(id)
-          end
-        )
+      server_entity do
+        find do |id, query:|
+          user = (
+            if id == "new"
+              User.new
+            else
+              User.find(id)
+            end
+          )
 
-        build(self, user)
-      end
-
-      server do
+          build(self, user)
+        end
       end
     end
   end

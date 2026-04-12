@@ -30,8 +30,11 @@ module Interfacets
 
         def render
           receiver_index.each do |id, ch|
+            state = js_get_state(id)
+            next if state.nil?
+
             ch.receive(
-              payload: js_get_state(id).fetch("data"),
+              payload: state.fetch("data"),
               dispatch: ->(e) { dispatch(id, e) }
             )
           end

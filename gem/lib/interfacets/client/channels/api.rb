@@ -22,7 +22,7 @@ module Interfacets
             }
           end
 
-          def submit(meth)
+          def submit(meth, nesting: )
             raise("only one submission per action") if request
 
             System.logger.debug("submitting #{meth}")
@@ -46,7 +46,7 @@ module Interfacets
                       .serialize(
                         to: "server" ,
                         action: meth,
-                        nesting: ["root"]
+                        nesting:
                       )
                   )
                 },
@@ -81,7 +81,14 @@ module Interfacets
 
         def handle(event:, entity:, build_entity:)
           facet_name = event.fetch("facet")
-          entity = build_entity.(facet_name)
+          id = event.dig(
+            "payload",
+            "payload",
+            "attributes",
+            "internal_entity_id"
+          )
+
+          entity = build_entity.(facet_name, id)
 
           Shared::Entities::Bus
             .new(entity:)

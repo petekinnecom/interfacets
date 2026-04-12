@@ -3,20 +3,6 @@
 module Interfacets
   module Server
     class Api
-      class Channel
-        attr_reader :klass, :store
-
-        def rendered?
-          @rendered
-        end
-
-        def render(klass, store)
-          @rendered = true
-          @klass = klass
-          @store = store
-        end
-      end
-
       attr_reader :entity, :name, :registry
       def initialize(entity:, name:, registry:)
         @entity = entity
@@ -25,36 +11,30 @@ module Interfacets
       end
 
       def handle(event)
-        channel = Channel.new
-
-        entity.channel = channel
         Shared::Entities::Bus
           .new(entity:)
           .handle(event:)
 
         if entity.channel.rendered?
-          registry.build(
-            channel.klass,
-            channel.store,
-          ).render
+          entity.channel.render_facet
         else
-          emit("after_#{event.fetch("action")}")
+          emit("after_#{event.fetch("action")}", nesting: event.fetch("nesting"))
         end
       end
 
       def render
-        emit("after_load")
+        emit("after_load", nesting: ["root"])
       end
 
       private
 
-      def emit(action)
+      def emit(action, nesting: )
         {
           facet: name,
           payload: (
             Shared::Entities::Bus
               .new(entity:)
-              .serialize(to: "client", action:, nesting: ["root"])
+              .serialize(to: "client", action:, nesting:)
           )
         }
       end

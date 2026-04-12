@@ -8,61 +8,6 @@ module Interfacets
       module Receivers
         class React
           class Node
-            class XmlParser
-              attr_reader :json
-              def initialize(json)
-                @json = json
-              end
-
-              def call
-                xml = Nokogiri::XML.fragment("<Facet/>")
-                json
-                  .dig("streams", "default", "dom")
-                  .map { parse_element(_1) }
-                  .each { xml.add_child(_1) }
-                xml
-              end
-
-              private
-
-              def parse_attribute(value)
-                case value
-                when Array
-                when Hash
-                  value.transform_values { parse_attribute(_1) }
-                when Numeric, String, TrueClass, FalseClass, NilClass
-                  value
-                else
-                  raise "unknown attribute type: #{value}"
-                end
-              end
-
-              def parse_element(el)
-                case el.fetch("type")
-                when "interfacets:string-node"
-                  el.dig("attributes", "value")
-                when "interfacets:react-dom:element"
-                  xml = (
-                    el
-                      .fetch("element")
-                      .then { Nokogiri::XML.fragment("<#{_1} />").children.first }
-                  )
-
-                  el.fetch("children").each do |child|
-                    xml.add_child(parse_element(child)) if child
-                  end
-
-                  el.fetch("attributes").each do |name, value|
-                    xml.set_attribute(name, parse_attribute(value).to_json)
-                  end
-
-                  xml
-                else
-                  raise "unknown type: #{el.fetch("type")}"
-                end
-              end
-            end
-
             def self.parse(json:, dispatch:)
               new(
                 xml: XmlParser.new(json).call,
@@ -72,7 +17,7 @@ module Interfacets
             end
 
             Error = Class.new(StandardError)
-            NoMatchesErrorError = Class.new(Error)
+            NoMatchesError = Class.new(Error)
             MultipleMatchesError = Class.new(Error)
             StaleNodeError = Class.new(Error) do
               def initialize
@@ -100,6 +45,20 @@ module Interfacets
 
             def stale?
               @stale || parent&.stale?
+            end
+
+            def component_name
+              raise StaleNodeError if stale?
+
+              xml.name
+            end
+
+            def props
+              raise StaleNodeError if stale?
+
+              xml.attributes.transform_values do |attr|
+                attr.value.then { JSON.parse(_1) rescue _1 }
+              end
             end
 
             def content
@@ -134,7 +93,7 @@ module Interfacets
                   (
                     content == EMPTY_ARG || (
                       if content.is_a?(Regexp)
-                        _1.content.match(content)
+                        _1.content.match?(content)
                       else
                         _1.content == content
                       end
@@ -149,7 +108,8 @@ module Interfacets
 
               xml
                 .attribute(name)
-                .then { JSON.parse(_1) }
+                &.value
+                &.then { JSON.parse(_1) rescue _1 }
             end
 
             def trigger(name, data = {})

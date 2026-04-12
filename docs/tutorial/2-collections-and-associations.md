@@ -57,15 +57,17 @@ view do |person|
   end
 end
 
-shared do
+entity_base do
   accessor(:name)
   reference(:address) do
     accessor(:state)
   end
 end
 
-find do |id, query:|
-  build(self, Person.find(id))
+server_entity do
+  find do |id, query:|
+    build(self, Person.find(id))
+  end
 end
 ```
 ## Collections
@@ -108,15 +110,17 @@ view do |person|
   end
 end
 
-shared do
+entity_base do
   accessor(:name)
   collection(:phone_numbers) do
     accessor(:value)
   end
 end
 
-find do |id, **|
-  build(self, Person.find(id))
+server_entity do
+  find do |id, query:|
+    build(self, Person.find(id))
+  end
 end
 ```
 
@@ -129,26 +133,27 @@ The following example shows the same Address example as above, but uses `OpenStr
 The same overrides are available for collections.
 
 ```ruby
-find do |id, **|
-  address = OpenStruct.new(
-    id:,
-    name: "Pete",
-    the_address: OpenStruct.new(
-      the_city: "Portland"
-    )
-  )
 
-  build(self, address)
-end
-
-shared do
+entity_base do
   accessor(:name)
   reference(:address) do
     accessor(:state)
   end
 end
 
-server do
+server_entity do
+  find do |id, **|
+    address = OpenStruct.new(
+      id:,
+      name: "Pete",
+      the_address: OpenStruct.new(
+        the_city: "Portland"
+      )
+    )
+
+    build(self, address)
+  end
+
   alias :store :person
 
   reference(
@@ -175,7 +180,7 @@ All associations can access their parent entity using the `parent` method.
 The following example shows an address that includes the person's name:
 
 ```ruby
-client do
+client_entity do
   reference(:address) do
     def name_and_state
       [
@@ -186,7 +191,7 @@ client do
   end
 end
 
-shared do
+entity_base do
   accessor(:name)
   reference(:address) do
     accessor(:state)
@@ -215,7 +220,7 @@ For an association, you can pass a custom `getter`, `setter`, and `builder` call
 In order to understand the builder, consider the following scenarios for the `address` reference from the prior examples:
 
 ```ruby
-server do
+server_entity do
   reference(
     :address,
     identifier: :id,
@@ -283,19 +288,19 @@ view do |person|
   end
 end
 
-client do
+client_entity do
   def remove_phone_number(phone_number)
     phone_number.marked_for_destruction = true
   end
 end
 
-shared do
+entity_base do
   collection(:phone_numbers) do
     accessor(:marked_for_destruction)
   end
 end
 
-server do
+server_entity do
   collection(
     :phone_numbers,
     builder: -> { record.association(:phone_numbers).build }

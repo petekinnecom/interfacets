@@ -78,6 +78,54 @@ browser.one("Button").trigger("onClick")
 assert_equal "Updated Name", user.reload.name
 ```
 
+## Testing Timers
+
+Timer callbacks can be tested by manually triggering them instead of waiting for the actual timeout to occur.
+
+First, register a timer callback in your client entity:
+
+```ruby
+client_entity do
+  def setup_auto_save
+    channel(:timer).callback(in_ms: 5 * 1000.0) do
+      self.save
+    end
+  end
+end
+```
+
+In your view, trigger the timer setup:
+
+```ruby
+view do |user|
+  render(:dom) do |c|
+    c.button("Enable auto-save", onClick: -> { user.setup_auto_save })
+  end
+end
+```
+
+Then in your test, you can manually trigger the timer:
+
+```ruby
+user = User.create!(name: "user-name")
+browser.visit("/ui/users/#{user.id}")
+
+# Click button to register the timer
+browser.dom.one("button", content: "Enable auto-save").trigger("onClick")
+
+# Verify a timer was registered
+assert_equal 1, browser.timers.registrations.size
+assert_equal 5000.0, browser.timers.first.ms
+
+# Manually trigger the timer (instead of waiting 5 seconds)
+browser.timers.first.notify
+
+# Verify the callback executed
+assert_equal true, user.reload.auto_saved
+```
+
+You can access all registered timers through `browser.timers.registrations` and trigger them individually with `.notify`. This allows you to test timer-based behavior without actually waiting for timeouts, keeping your tests fast and deterministic.
+
 ## Running tests through MRuby/WASM
 
 MRuby is not exactly the same as CRuby (aka, MRI). Your tests will give you more confidence if the client code is interpreted by MRuby running in WASM, as it will occur on the client.

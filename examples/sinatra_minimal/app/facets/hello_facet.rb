@@ -17,19 +17,19 @@ class HelloFacet
     end
   end
 
-  client do
+  client_entity do
   end
 
-  shared do
+  entity_base do
     accessor(:time, accepted_by: :client)
     server_action(:update)
   end
 
-  find do |id, query:|
-    build(self, OpenStruct.new(message: "Welcome to Sinatra + Interfacets!"))
-  end
+  server_entity do
+    find do |id, query:|
+      build(self, OpenStruct.new(message: "Welcome to Sinatra + Interfacets!"))
+    end
 
-  server do
     def time
       Time.now.to_f
     end

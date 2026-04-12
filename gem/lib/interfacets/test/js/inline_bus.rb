@@ -19,7 +19,7 @@ module Interfacets
             type: "interfacets:system:create_bus",
             payload: {
               id: "default",
-              channel_ids: ["interfacets:api", "dom", "url"],
+              channel_ids: ["interfacets:api", "dom", "url", "timer"],
               hydration: {
                 destination: { bus: "default", channel: "interfacets:api" },
                 type: "interfacets:api:hydrate",
@@ -28,6 +28,10 @@ module Interfacets
               config: client_system_json,
             }
           }))
+        end
+
+        def dispatch(channel_id, event)
+          dispatch_to_bus(bus_id: "default", channel_id: channel_id, event: event)
         end
 
         private
@@ -40,21 +44,33 @@ module Interfacets
 
             bus_event.fetch("payload").each do |channel_event|
               channel_id = channel_event.fetch("id")
-              receiver_index
-                .fetch(channel_id)
+              receiver = receiver_index.fetch(channel_id)
+
+              receiver
                 .receive(
                   payload: channel_event.fetch("payload"),
                   dispatch: ->(ev) {
-                    dispatch(bus_id:, channel_id:, event: ev)
+                    dispatch_to_bus(bus_id:, channel_id:, event: ev)
                   },
                 )
             end
           else
             raise("unhandled event type: #{event}")
           end
+
+          # Flush any responses that may have come from the server
+          # should separate this out so that auto-flush or manual-flush
+          # is possible to simulate ordering events as needed.
+          receiver_index.each do |channel_id, receiver|
+            if receiver.respond_to?(:response_queue)
+              receiver.flush_responses.each do |response|
+                dispatch_to_bus(bus_id:, channel_id:, event: response)
+              end
+            end
+          end
         end
 
-        def dispatch(bus_id:, channel_id:, event:)
+        def dispatch_to_bus(bus_id:, channel_id:, event:)
           client.handle(
             H.j(
               {

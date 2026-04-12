@@ -37,7 +37,7 @@ module Interfacets
       def blank?(str)
         return true if str.nil?
         return str.empty? if str.is_a?(Array)
-        return str.match(/^\s*$/) if str.is_a?(String)
+        return str.match(/\A\s*\z/) if str.is_a?(String)
 
         raise("unsupported blank check")
       end

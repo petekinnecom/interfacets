@@ -54,27 +54,27 @@ class PersonFacet < ApplicationFacet
   end
 
   # Code specific to the frontend
-  client do
+  client_entity do
     def full_name
       "#{first_name} #{last_name}"
     end
   end
 
   # Define your API
-  shared do
+  entity_base do
     accessor(:id, accepted_by: :client)
     accessor(:first_name)
     accessor(:last_name)
     server_action(:save)
   end
 
-  # Load the record on the backend.
-  find do |id, query:|
-    build(self, Person.find(id))
-  end
-
   # Code specific to the backend
-  server do
+  server_entity do
+    # How to load the record on the backend.
+    find do |id, query:|
+      build(self, Person.find(id))
+    end
+
     # `record` here is that Person.find(id) object
 
     # All methods delegated to the record by default.

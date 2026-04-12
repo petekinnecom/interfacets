@@ -3,11 +3,17 @@
 module Interfacets
   module Client
     class Registry
-      def build(name)
+      def initialize
+        @stores = {}
+      end
+
+      def build(name, id)
         entity = Object.const_get("#{name}::Client::Entity")
 
+        @stores[id] ||= entity.store.new
+
         entity.new(
-          store: entity.store.new,
+          store: @stores[id],
           parent: nil,
           nesting: ["root"]
         )
@@ -29,14 +35,14 @@ module Interfacets
             define_singleton_method(:view) { view }
             self.manifest = shared
 
-            schema.fetch("shared").each { class_exec(&eval(_1)) }
-            schema.fetch("client").each { class_exec(&eval(_1)) }
-
             actions.each do |name, spec|
               if name.start_with?("after_")
                 define_method(name) {}
               end
             end
+
+            schema.fetch("shared").each { class_exec(&eval(_1)) }
+            schema.fetch("client").each { class_exec(&eval(_1)) }
           end
 
           store = Shared::GeneratedStore.construct(entity)

@@ -24,8 +24,12 @@ module Interfacets
           end
 
           entity_class.actions.each do |name, spec|
-            klass.define_method(name) do
-              Client::System.current_bus.channel("interfacets:api").builder.submit(name)
+            klass.define_method(name) do |entity:|
+              Client::System
+                .current_bus
+                .channel("interfacets:api")
+                .builder
+                .submit(name, nesting: entity.entity_nesting)
             end
           end
 

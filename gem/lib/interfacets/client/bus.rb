@@ -48,7 +48,11 @@ module Interfacets
         channel.handle(
           entity: @entity,
           event: event.fetch("payload"),
-          build_entity: ->(name) { @entity = registry.build(name) }
+          build_entity: ->(name, id) {
+            @entity = registry.build(name, id)
+            channel_index.values.each { _1.prepare(@entity) }
+            @entity
+          }
         )
 
         channel_index.values.each { _1.prepare(entity) }

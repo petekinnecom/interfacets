@@ -52,7 +52,7 @@ view do |form|
   end
 end
 
-client do
+client_entity do
   validate do
     unless tos_accepted?
       errors.add(:tos, "Must accept Terms of Service")
@@ -60,7 +60,7 @@ client do
   end
 end
 
-shared do
+entity_base do
   validate do
     # ActiveSupport is not present in the client,
     # however, interfacets implements its `.blank?`

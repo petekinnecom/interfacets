@@ -25,10 +25,21 @@ module Interfacets
             return if payload.dig("streams", "default").nil?
             return if payload.dig("streams", "default").empty?
 
+            method = payload.dig("streams", "default", "method")
             url = payload.dig("streams", "default", "url")
-            payload
-              .dig("streams", "default", "body", "event", "payload")
-              .then { response_queue << router.call(url).handle(_1) }
+
+
+            if method == "get"
+              response_queue << router.call(url).render
+            else
+              payload
+                .dig("streams", "default", "body", "event", "payload")
+                .then { response_queue << router.call(url).handle(_1) }
+            end
+          end
+
+          def flush_responses
+            response_queue.tap { @response_queue = [] }
           end
         end
       end

@@ -53,7 +53,7 @@ class PersonFacet
     end
   end
 
-  client do
+  client_entity do
     # Inherits all shared behavior.
     #
     # By defaults, attributes create getters/setters
@@ -66,7 +66,7 @@ class PersonFacet
     end
   end
 
-  shared do
+  entity_base do
     # Defines the API between client/server.
 
     accessor(:id, accepted_by: :client)
@@ -74,12 +74,12 @@ class PersonFacet
     server_action(:save)
   end
 
-  find do |id, query:|
-    # How to build a facet from an ID (see "configuring")
-    build(self, Person.find(id))
-  end
+  server_entity do
+    find do |id, query:|
+      # How to build a facet from an ID (see "configuring")
+      build(self, Person.find(id))
+    end
 
-  server do
     # Inherits all shared behavior
 
     # By default, attributes create getters/setters

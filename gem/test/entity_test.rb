@@ -23,6 +23,7 @@ module Interfacets
         accessor(:id)
         accessor(:name)
         action(:nested_save, accepted_by: :server)
+        server_action(:nested_server_action)
       end
 
       def full_name
@@ -58,6 +59,14 @@ module Interfacets
 
         def nested_save_called?
           @nested_save_called
+        end
+
+        def nested_server_action
+          @nested_server_action_called = true
+        end
+
+        def nested_server_action_called?
+          @nested_server_action_called = true
         end
       end
 
@@ -531,12 +540,57 @@ module Interfacets
       assert @server_entity.hats.first.nested_save_called?
     end
 
+    def test_nested_server_action
+      init_event = (
+        @server_bridge
+          .serialize(
+            to: "client",
+            action: "after_load",
+            nesting: @server_entity.entity_nesting,
+          )
+          .then { H.j(_1) }
+      )
+
+      @client_bridge.handle(event: init_event)
+
+      event = (
+        @client_bridge
+          .serialize(
+            to: "server",
+            action: "nested_server_action",
+            nesting: @client_entity.hats.first.entity_nesting,
+          )
+          .then { H.j(_1) }
+      )
+
+      @server_bridge.handle(event:)
+
+      assert @server_entity.hats.first.nested_server_action_called?
+    end
+
     def test_collection_proxy
       assert_equal 2, @server_entity.hats.count
       assert_equal 2, @server_store.hats.count
       @server_entity.hats.delete_at(0)
       assert_equal 1, @server_store.hats.count
       assert_equal 1, @server_entity.hats.count
+    end
+
+    def test_entity_at
+      assert_equal(
+        @server_entity,
+        @server_entity.entity_at(@server_entity.entity_nesting)
+      )
+
+      assert_equal(
+        @server_entity.hats.first,
+        @server_entity.entity_at(@server_entity.hats.first.entity_nesting)
+      )
+
+      assert_equal(
+        @server_entity.hats.last,
+        @server_entity.entity_at(@server_entity.hats.last.entity_nesting)
+      )
     end
   end
 end

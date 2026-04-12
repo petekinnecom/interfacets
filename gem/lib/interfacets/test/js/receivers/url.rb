@@ -32,6 +32,7 @@ module Interfacets
           attr_reader :server, :name, :response_queue
           def initialize(name:)
             @name = name
+            @response_queue = []
           end
 
           def receive(payload:, dispatch:)
@@ -47,6 +48,10 @@ module Interfacets
 
           def handler
             @handler
+          end
+
+          def flush_responses
+            response_queue.tap { @response_queue = [] }
           end
         end
       end

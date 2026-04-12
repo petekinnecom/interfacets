@@ -17,10 +17,6 @@ module Interfacets
         attr_accessor :db
       end
 
-      find do |id, query:|
-        build(self, TestFacet.db.fetch(id))
-      end
-
       view do |person|
         render(:url) do |c|
           c.path(person.api_path)
@@ -35,18 +31,22 @@ module Interfacets
         end
       end
 
-      client do
+      client_entity do
         role("client")
       end
 
-      shared do
+      entity_base do
         accessor(:id, accepted_by: :client)
         accessor(:name)
 
         server_action(:save)
       end
 
-      server do
+      server_entity do
+        find do |id, query:|
+          build(self, TestFacet.db.fetch(id))
+        end
+
         def save
           store.saved = true
         end

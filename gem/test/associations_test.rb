@@ -22,8 +22,10 @@ module Interfacets
       included do
         config(name: "city")
 
-        find do |_id|
-          new(CityRepo.city)
+        server_entity do
+          find do |_id|
+            new(CityRepo.city)
+          end
         end
 
         id { record.name }

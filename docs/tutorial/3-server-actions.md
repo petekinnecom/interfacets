@@ -48,7 +48,7 @@ view do |entity|
   end
 end
 
-client do
+client_entity do
   attr_accessor :saving
 
   def after_save
@@ -56,7 +56,7 @@ client do
   end
 end
 
-shared do
+entity_base do
   server_action(:save)
 end
 ```
@@ -77,7 +77,7 @@ view do |entity|
   end
 end
 
-client do
+client_entity do
   def person_count_message
     if @show_person_count
       "There are #{person_count} Person records"
@@ -89,12 +89,12 @@ client do
   end
 end
 
-shared do
+entity_base do
   accessor(:person_count, accepted_by: :client)
   server_action(:save)
 end
 
-server do
+server_entity do
   def person_count
     Person.count
   end
@@ -119,12 +119,12 @@ view do |entity|
   end
 end
 
-shared do
+entity_base do
   accessor(:flash_message, accepted_by: :client)
   server_action(:save)
 end
 
-server do
+server_entity do
   def flash_message
     @flash_message
   end
@@ -147,14 +147,14 @@ You cannot use `super` to invoke an action. Instead you must manually submit by 
 For example:
 
 ```ruby
-client do
+client_entity do
   def save
     @saving = true
     store.save
   end
 end
 
-shared do
+entity_base do
   server_action(:save)
 end
 ```

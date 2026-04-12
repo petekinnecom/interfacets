@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "interfacets", path: File.join(__dir__, "../gem")
+gem "interfacets", path: File.join(__dir__, "../../gem")
 gem "minitest", "~> 5.0"
 gem "nodo"
 

@@ -13,6 +13,21 @@ module Interfacets
           @role
         end
 
+        def merge(name, *events, &block)
+          spec = Entities::Specs::Merger.new(
+            name:,
+            block:
+          )
+
+          if events.empty?
+            mergers[name.to_s][:default] = spec
+          else
+            events.each do |event|
+              mergers[name.to_s][event.to_s] = spec
+            end
+          end
+        end
+
         def accessor(
           name,
           getter: -> { store.send(name) },
@@ -76,15 +91,17 @@ module Interfacets
         def server_action(name, only_if_valid: true)
           action(name, accepted_by: :server, only_if_valid:)
           action("after_#{name}", accepted_by: :client)
+
+          define_method(name) do
+            store.send(name, entity: self)
+          end
         end
 
         def action(name, accepted_by: Entities::Specs::ANY, only_if_valid: false)
           name = name.to_s
           actions[name] = Entities::Specs::Action.new(name:, accepted_by:, only_if_valid:)
 
-          define_method(name) do
-            store.send(name)
-          end
+          define_method(name) {}
         end
 
         def accessors
@@ -97,6 +114,19 @@ module Interfacets
 
         def actions
           @actions ||= {}
+        end
+
+        def mergers
+          @mergers ||= Hash.new { |h, k|
+            h[k] = {
+              default: Entities::Specs::Merger.new(
+                name: k,
+                block: ->(entity, value) {
+                  entity.send("#{k}=", value)
+                }
+              )
+            }
+          }
         end
 
         def attributes
@@ -159,6 +189,24 @@ module Interfacets
 
       def entity_nesting
         @entity_nesting ||= (parent&.entity_nesting || []) + [[@nesting, internal_entity_id]]
+      end
+
+      def entity_at(nesting)
+        # ignore first entry, cause it's self
+        real_nesting = nesting[1..-1]
+
+        if real_nesting.count == 0
+          self
+        else
+          assoc, internal_entity_id = real_nesting[0]
+
+          if association(assoc).collection?
+            association(assoc).get.find { _1.internal_entity_id == internal_entity_id }
+          else
+            value = association(assoc).get
+            value.internal_entity_id == internal_entity_id ? value : nil
+          end
+        end
       end
 
       def association(name)

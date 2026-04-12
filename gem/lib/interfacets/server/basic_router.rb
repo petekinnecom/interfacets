@@ -11,9 +11,11 @@ module Interfacets
 
         def call(klass:, id:, query:, resolved_path:)
           klass.bus = bus
+
+          bus.registry.ensure_registered(klass)
+
           klass
-            .find
-            .call(id, query:)
+            .find(id, query:)
             .tap { _1.entity.api_path = resolved_path }
         end
       end
@@ -26,12 +28,12 @@ module Interfacets
       end
 
       def call(url, query: {})
-        if url.nil? && default
-          klass = klass_for(default)
-          evaluator.call(klass:, id: nil, query:, resolved_path: default)
-        end
+        path = normalize(url)
 
-        path = url.sub(/^#{bus.root_url}/, "/").sub(/^/, "/").sub(%r{^/*}, "/")
+        if path.nil? && default
+          klass = klass_for(default)
+          return evaluator.call(klass:, id: nil, query:, resolved_path: default)
+        end
 
         if normalized_paths.key?(path)
           klass = klass_for(path)
@@ -58,7 +60,7 @@ module Interfacets
       end
 
       def klass_for(path)
-        val = normalized_paths.fetch(path)
+        val = normalized_paths.fetch(normalize(path))
 
         (val.is_a?(String) ? Object.const_get(val) : val)
       end
@@ -66,9 +68,16 @@ module Interfacets
       def normalized_paths
         @normalized_paths ||= (
           paths
-            .transform_keys { _1.start_with?("/") ? _1 : "/#{_1}" }
+            .transform_keys { normalize(_1) }
         )
       end
+
+      def normalize(path)
+        path
+          &.sub(/^#{bus.root_url}/, "/")
+          &.sub(/^/, "/")
+          &.sub(%r{^/*}, "/")
+        end
     end
   end
 end

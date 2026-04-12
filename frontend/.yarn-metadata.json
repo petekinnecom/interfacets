@@ -32,9 +32,9 @@
   "remote": {
     "type": "copy",
     "registry": "npm",
-    "hash": "69f5ce03-bdb0-4ade-8ddb-e654f3d29048-1756138359097",
-    "reference": "/home/pete/data/dev/repos/homeserver/services/hub/libs/interfacets"
+    "hash": "8e97ec5d-e0d9-4e05-8e89-4a9b6f846838-1775946173020",
+    "reference": "/home/pete/data/dev/repos/unified/libs/interfacets"
   },
   "registry": "npm",
-  "hash": "69f5ce03-bdb0-4ade-8ddb-e654f3d29048-1756138359097"
+  "hash": "8e97ec5d-e0d9-4e05-8e89-4a9b6f846838-1775946173020"
 }

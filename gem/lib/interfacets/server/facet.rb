@@ -22,7 +22,7 @@ module Interfacets
           @views ||= []
         end
 
-        def client(&block)
+        def client_entity(&block)
           clients << block
         end
 
@@ -30,16 +30,20 @@ module Interfacets
           @clients ||= []
         end
 
-        def shared(&block)
-          shareds << block
+        def entity_base(&block)
+          bases << block
         end
 
-        def shareds
-          @shareds ||= []
+        def bases
+          @bases ||= []
         end
 
-        def server(&block)
-          servers << block
+        def server_entity(unshift: false, &block)
+          if unshift
+            servers.unshift(block)
+          else
+            servers << block
+          end
         end
 
         def servers
