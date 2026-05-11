@@ -1,0 +1,24 @@
+# Test fixture for JS Registry Generation
+Button:
+  js:
+    path: "./components/Button"
+    default: true
+
+Header:
+  js:
+    path: "./components/Header"
+    export: "HeaderComponent"
+
+Badge:
+  js:
+    path: "./components/Badge"
+
+# Case where registry key differs from JS export name
+RubySideName:
+  js:
+    path: "./components/JSImplementation"
+    export: "JSComponentName"
+
+ServerOnly:
+  props:
+    foo: { type: "string" }

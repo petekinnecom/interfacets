@@ -15,7 +15,7 @@ module Interfacets
       action(:save, accepted_by: :server)
       action(:after_save, accepted_by: :client)
 
-      association(:phone_number) do
+      reference(:phone_number) do
         accessor(:value)
       end
 
@@ -34,7 +34,7 @@ module Interfacets
     CLIENT_BLOCK = ->(*) {
       role(:client)
 
-      association(:phone_number)
+      reference(:phone_number)
       collection(:hats)
 
       def after_save
@@ -47,7 +47,7 @@ module Interfacets
     SERVER_BLOCK = ->(*) {
       role(:server)
 
-      association(:phone_number, builder: -> { PhoneNumber.new })
+      reference(:phone_number, builder: -> { PhoneNumber.new })
       collection(:hats, builder: -> { Hat.new }) do
         def full_name
           "full_name: #{name}"

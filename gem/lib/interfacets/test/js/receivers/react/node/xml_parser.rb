@@ -9,9 +9,10 @@ module Interfacets
         class React
           class Node
             class XmlParser
-              attr_reader :json
-              def initialize(json)
+              attr_reader :json, :validation_engine
+              def initialize(json, validation_engine:)
                 @json = json
+                @validation_engine = validation_engine
               end
 
               def call
@@ -48,6 +49,7 @@ module Interfacets
                   xml = (
                     el
                       .fetch("element")
+                      .tap { validation_engine&.validate_props(_1, el.fetch("attributes")) }
                       .then { Nokogiri::XML.fragment("<#{_1} />").children.first }
                   )
 

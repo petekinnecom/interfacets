@@ -41,8 +41,8 @@ class BrowserTest < InterfacetsTest
         s.config.app_host = "http://localhost:#{@server.port}"
       end
 
-    browser.visit("/interfacets/system")
+    ui.visit("/interfacets/system")
     sleep(10)
-    assert_equal("hi hi", browser.text)
+    assert_equal("hi hi", ui.text)
   end
 end

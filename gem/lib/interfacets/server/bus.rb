@@ -9,20 +9,15 @@ module Interfacets
         :registry,
       )
 
-      def initialize(
-        root_url:,
-        asset_paths:,
-        facets:,
-        build_dir:
-      )
-        @registry = Registry.new(facets:, build_dir:)
+      def initialize(root_url:, asset_paths:)
+        @registry = Registry.new
         @root_url = root_url
         @asset_paths = asset_paths
       end
 
-      def client_system_json
+      def client_system_json(only_facets: false)
         {
-          assets: Assets.bundle(dirs: asset_paths, registry:),
+          assets: Assets.bundle(dirs: asset_paths, registry:, only_facets:),
           root_url:
         }
       end

@@ -33,6 +33,7 @@ class InterfacetsLogger
       puts "#{method_name.to_s.upcase}: #{message}" if level_value >= @level
     end
   end
+
 end
 
 $VERBOSE = original_verbose

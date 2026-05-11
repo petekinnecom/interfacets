@@ -8,10 +8,11 @@ module Interfacets
       module Receivers
         class React
           class Node
-            def self.parse(json:, dispatch:)
+            def self.parse(json:, dispatch:, validation_engine:)
               new(
-                xml: XmlParser.new(json).call,
+                xml: XmlParser.new(json, validation_engine:).call,
                 dispatch:,
+                validation_engine:,
                 parent: nil,
               )
             end
@@ -32,11 +33,12 @@ module Interfacets
               end
             end
 
-            attr_reader :xml, :dispatch, :parent
-            def initialize(xml:, dispatch:, parent:)
+            attr_reader :xml, :dispatch, :parent, :validation_engine
+            def initialize(xml:, dispatch:, parent:, validation_engine:)
               @xml = xml
               @dispatch = dispatch
               @parent = parent
+              @validation_engine = validation_engine
             end
 
             def stale!
@@ -88,7 +90,7 @@ module Interfacets
 
               xml
                 .css(*a, **p)
-                .map { Node.new(xml: _1, dispatch:, parent: self) }
+                .map { Node.new(xml: _1, dispatch:, parent: self, validation_engine:) }
                 .select {
                   (
                     content == EMPTY_ARG || (
@@ -115,7 +117,11 @@ module Interfacets
             def trigger(name, data = {})
               raise StaleNodeError if stale?
 
+              validation_engine&.validate_event(xml.name, name, data)
+
               value = attribute(name.to_s)
+              raise "No event handler registered for: #{name}" unless value
+
               value["payload"]["event"] = data
               dispatch.(value)
             end

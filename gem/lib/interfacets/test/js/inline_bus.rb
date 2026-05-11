@@ -85,13 +85,6 @@ module Interfacets
         def client
           @client ||= (
             $asset_logger = Logger.new("/dev/null")
-            original_verbose = $VERBOSE
-            $VERBOSE = nil
-            begin
-              Client::Assets.bootstrap(client_system_json.fetch("assets"))
-            ensure
-              $VERBOSE = original_verbose
-            end
             Client::System.logger = $asset_logger
 
             Client.start(

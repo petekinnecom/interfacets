@@ -1,0 +1,13 @@
+props:
+  type: object
+  properties:
+    onAction:
+      is_event: true
+    onComplexAction:
+      is_event: true
+      schema:
+        type: object
+        required: [id]
+        properties:
+          id: { type: integer }
+          message: { type: string }

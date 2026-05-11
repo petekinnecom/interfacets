@@ -17,4 +17,7 @@ class InterfacetsTest < Minitest::Test
     end
   end
 
+  def setup
+    FileUtils.rm_rf("tmp/build")
+  end
 end

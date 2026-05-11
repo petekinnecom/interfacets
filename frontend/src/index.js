@@ -8,6 +8,7 @@ export {
   InterfacetsProvider,
   FacetRenderer,
 } from "./channels/react.js"
+export { withTransform } from "./interfacets/withTransform.js"
 
 // Channel handlers
 export { submitHandler } from "./channels/api.js"

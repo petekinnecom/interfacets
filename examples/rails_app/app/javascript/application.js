@@ -7,6 +7,8 @@ import {
   urlHandler,
 } from "interfacets"
 
+import { registry } from "./interfacets/registry"
+
 import React, { useEffect } from "react"
 import { createRoot } from "react-dom/client";
 
@@ -47,7 +49,7 @@ const MyApp = ({ }) => {
         dom: {
           receive: reactHandler({
             bus: "default",
-            registry: {},
+            registry,
           })
         },
         url: { receive: urlHandler() },

@@ -37,6 +37,20 @@ module Interfacets
               payload: state.fetch("data"),
               dispatch: ->(e) { dispatch(id, e) }
             )
+
+            receiver_index.each do |id, ch|
+              if ch.respond_to?(:response_queue)
+                ch.flush_responses.each do |response|
+                  dispatch(id, response)
+                end
+              end
+            end
+          end
+
+          if js_get_logs.any? { _1.fetch("type") == "error" }
+            js_get_logs
+            .map { _1.fetch("value") }
+            .then { raise(_1.join("\n")) }
           end
         end
 

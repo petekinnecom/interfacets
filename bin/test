@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+(cd gem && bundle exec rake test)
+(cd examples/rails_app && bundle exec rake test)
+(cd frontend && npm test)

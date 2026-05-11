@@ -44,11 +44,11 @@ module Interfacets
 
           class Reference < Handler
             def collection?
-              true
+              false
             end
 
             def reference?
-              false
+              true
             end
 
             def get

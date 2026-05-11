@@ -6,6 +6,8 @@ import React, {
   forwardRef,
 } from "react"
 
+import { withTransform } from "../interfacets/withTransform"
+
 const buses = {}
 const defaultState = {}
 
@@ -16,16 +18,7 @@ const memoizedAction = (value, dispatch) => {
 
   if (!memoizedActions[id]) {
     memoizedActions[id] = async (ev) => {
-      // need to handle events better
-      // ev?.preventDefault ? ev.preventDefault() : null
-      if (ev?.target) {
-        // This is an HTML event which can't be serialized
-        value.payload["event"] = {
-          value: ev.target?.value,
-        }
-      } else {
-        value.payload["event"] = ev
-      }
+      value.payload["event"] = ev
       dispatch(value)
     }
   }
@@ -45,13 +38,20 @@ const convertAttributesToJs = ({
   } else if (value?.type == "interfacets:react-dom:action") {
     return async (ev) => {
       ev?.preventDefault ? ev.preventDefault() : null
-      if (ev?.target) {
-        // This is an HTML event which can't be serialized
-        value.payload["event"] = {
-          value: ev.target?.value,
+      try {
+        value.payload["event"] = JSON.parse(JSON.stringify(ev))
+      } catch (e) {
+
+        // TEMPORARY RESTORE
+        if (ev?.target) {
+          // This is an HTML event which can't be serialized
+          value.payload["event"] = {
+            value: ev.target?.value,
+          }
+        } else {
+          value.payload["event"] = ev
         }
-      } else {
-        value.payload["event"] = ev
+        console.warn(`Failed to serialize event for ${value}. Using fallback`)
       }
       dispatch(value)
     }
@@ -62,6 +62,8 @@ const convertAttributesToJs = ({
     return value.payload["path"].reduce((o, i) => o[i], jsProps)
   } else if (value?.type == "interfacets:react-dom:element") {
     return render({ ...value, dispatch, registry })
+  } else if (value?.type == "interfacets:mount-metadata") {
+    return render({ ...value['content'], dispatch, registry })
   } else if (Array.isArray(value)) {
     return value.map(v => convertAttributesToJs({ registry, value: v, dispatch, jsProps, depth: depth + 1 }))
   } else if (value === null || value === undefined) {
@@ -148,6 +150,7 @@ export function reactHandler({ registry, bus }) {
   registry["Interfacets.Cache"] = CacheNode
   registry["Interfacets.Memo"] = MemoNode
   registry["input"] ||= defaultInput
+
   buses[bus] = {
     ...buses[bus],
     renderCount: 0,

@@ -5,8 +5,9 @@
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)
 
 <br/>
 
@@ -28,7 +29,7 @@ Strings can be attached to the DOM in two ways:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.div do
       c.string("Here's a string in a div")
     end
@@ -40,7 +41,7 @@ end
 
 ### Custom React components
 
-In order to render a custom react component, you must pass it to interfacet's registry in your javascript configuration:
+In order to render a custom react component, you must pass it to Interfacets' registry in your javascript configuration:
 
 ```javascript
 import { MyComponent1 } from "some-awesome-library"
@@ -69,7 +70,7 @@ The above configuration will make those components available to you in ruby:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.MyComponent1 do
       c.string("Here's a string in a div")
     end
@@ -81,6 +82,122 @@ view do |entity|
 end
 ```
 
+### Component Registry & Validation (`components.yml`)
+
+While you can manually register components in your JavaScript configuration, Interfacets provides a "contract-first" approach using a `config/interfacets/components.yml` file. This file acts as a central source of truth for your component interfaces.
+
+#### Defining the Contract
+
+Each component is defined with its contract, which includes expected `props` (which can be either data props or event handlers). You can also provide metadata for JavaScript generation.
+
+Props and events are defined in a single, consolidated `props` object.
+
+```yaml
+# config/interfacets/components.yml
+TextField:
+  js:
+    path: "./components/inputs/TextField"
+    default: true
+  props:
+    label:
+      type: string
+    value:
+      type: string
+    onChange:
+      type: event
+      is_event: true
+      payload:
+        type: object
+        required: [value]
+        properties:
+          value: { type: string }
+```
+
+#### Event Validation
+
+You can specify that a component prop is an event callback by adding `is_event: true` to its definition. You can also provide a `payload` schema to validate the data passed to the event.
+
+```yaml
+# components.yml
+MyComponent:
+  props:
+    onAction:
+      is_event: true
+      payload:
+        type: object
+        required: [id]
+        properties:
+          id: { type: integer }
+```
+
+#### Declarative Event Transformations
+
+When using JavaScript components, you often need to map complex browser events (like DOM `onChange`) to simple serializable hashes. You can do this declaratively in `components.yml` by adding a `transform` key to an event prop.
+
+```yaml
+# components.yml
+MyInput:
+  js: { path: "./MyInput", default: true }
+  props:
+    onChange:
+      is_event: true
+      transform:
+        value: [0, "target", "value"]
+```
+
+The transformation path is an array where the first element is the argument index, and subsequent elements are property names to traverse. In the example above, it extracts `arguments[0].target.value` and maps it to the `value` key in the event payload.
+
+#### Automated Registry Generation
+
+Instead of manually importing every component in your `initBus` call, you can generate a `registry.js` file from your YAML manifest.
+
+```ruby
+# In a Rake task or initialization script
+registry = Interfacets::ComponentRegistry.new(config_path: "config/interfacets/components.yml")
+registry.write_client_registry(path: "app/javascript/interfacets/registry.js")
+```
+
+In a Rails application, you can automate this with a Rake task and ensure it runs before your JavaScript build:
+
+```ruby
+# lib/tasks/interfacets.rake
+namespace :interfacets do
+  desc "Synchronize component registry"
+  task :sync => :environment do
+    require "interfacets/component_registry"
+    registry = Interfacets::ComponentRegistry.new(
+      config_path: Rails.root.join("config/components.yml")
+    )
+    registry.write_client_registry(
+      path: Rails.root.join("app/javascript/interfacets/registry.js")
+    )
+    puts "Interfacets registry synchronized"
+  end
+end
+
+# Ensure interfacets:sync runs before javascript:build
+if Rake::Task.task_defined?("javascript:build")
+  Rake::Task["javascript:build"].enhance(["interfacets:sync"])
+end
+```
+
+The generated file will contain the necessary ES6 imports and a mapping that can be imported directly into your JavaScript setup.
+
+#### Schema Validation in Tests
+
+One of the most powerful features of `components.yml` is automatic contract enforcement during tests. When you render a component in a Ruby test, Interfacets will:
+
+1.  **Verify the component exists**:
+    - For **custom components**, if it's rendered but not defined in `components.yml`, it will raise a `MissingComponentContractError`.
+    - For **standard HTML/SVG components** (e.g., `div`, `button`, `svg`), this check is optional. You can use them without a contract.
+2.  **Validate Props**:
+    - For **custom components**, a `props` schema is mandatory. Missing schemas will raise a `ValidationError`.
+    - For **standard components**, validation only occurs if a `props` schema is explicitly provided in `components.yml`.
+3.  **Validate Event Payloads**:
+    - Similar to props, events for custom components must have a schema, while standard components only validate if a schema is defined.
+
+This ensures that your Ruby code always sends data that your React components expect, and vice-versa, while allowing you to use standard web primitives with zero configuration.
+
 ## Callbacks
 
 If a prop's value is a lambda, it will be converted to a function before being passed to the react component. The arguments to the lambda are controlled by the component.
@@ -91,7 +208,7 @@ For example:
 
 ```ruby
 view do |person|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.MyCustomComponent(
       onChange: ->(new_value) { person.thing = new_value },
       onCancel: -> { puts "Canceled!" }
@@ -112,7 +229,7 @@ The positional args will be joined to form the unique identifier. The `on` can b
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.memo(:header, on: "static") do
       c.h1("the header")
     end
@@ -145,7 +262,7 @@ For example:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.MyLayoutComponent(
       header: c.capture { c.p("The header") },
       body: c.capture { c.p("The body") },
@@ -165,11 +282,11 @@ For example:
 
 ```ruby
 view do |entity|
-  render(:url) do |c|
+  render_to(:url) do |c|
     c.path("/people/#{entity.uuid}")
   end
 
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.button(
       "Back to dashboard",
 
@@ -198,7 +315,7 @@ For example:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.button(
       "view person 17",
       onClick: -> {
@@ -223,5 +340,6 @@ There are some other channels in there, including a way to control the Audio eng
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)

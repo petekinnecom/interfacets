@@ -28,7 +28,7 @@ module Interfacets
 
         id { record.name }
 
-        render("dom") do |c|
+        render_to("dom") do |c|
           facet.cities.each_with_index do |city, i|
             c.div(
               value: city.name,
@@ -70,7 +70,7 @@ module Interfacets
 
     def test_explicit_and_nested
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include StateFacet
 
           collection(:cities) do
@@ -106,39 +106,39 @@ module Interfacets
       )
       assert_equal(
         ["Portland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-0")
+      ui.c("dom").trigger("update-0")
       assert_equal(
         ["NewPortland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-1")
+      ui.c("dom").trigger("update-1")
       assert_equal(
         ["NewPortland", "NewSalem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("add")
+      ui.c("dom").trigger("add")
       assert_equal(
         ["NewPortland", "NewSalem", "added"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("remove")
+      ui.c("dom").trigger("remove")
       assert_equal(
         ["NewPortland", "NewSalem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
-      browser.c("dom").trigger("submit")
+      ui.c("dom").trigger("submit")
       assert_equal(["NewPortland", "NewSalem"], StateRepo.saved.cities.map(&:name))
     end
 
     def test_implicit_read
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include StateFacet
 
           collection(:cities) do
@@ -164,39 +164,39 @@ module Interfacets
       )
       assert_equal(
         ["Portland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-0")
+      ui.c("dom").trigger("update-0")
       assert_equal(
         ["NewPortland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-1")
+      ui.c("dom").trigger("update-1")
       assert_equal(
         ["NewPortland", "NewSalem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
-      browser.c("dom").trigger("remove")
+      ui.c("dom").trigger("remove")
       assert_equal(
         ["NewPortland"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("add")
+      ui.c("dom").trigger("add")
       assert_equal(
         ["NewPortland", "added"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("submit")
+      ui.c("dom").trigger("submit")
       assert_equal(["NewPortland", "added"], StateRepo.saved.cities.map(&:name))
     end
 
     def test_non_nested_class
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(name: "city")
 
           id { record.name }
@@ -205,7 +205,7 @@ module Interfacets
         end
 
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include StateFacet
           collection(:cities, city_facet) do
             build { City.new }
@@ -224,44 +224,44 @@ module Interfacets
       )
       assert_equal(
         ["Portland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-0")
+      ui.c("dom").trigger("update-0")
       assert_equal(
         ["NewPortland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("update-1")
+      ui.c("dom").trigger("update-1")
       assert_equal(
         ["NewPortland", "NewSalem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
-      browser.c("dom").trigger("remove")
+      ui.c("dom").trigger("remove")
       assert_equal(
         ["NewPortland"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("add")
+      ui.c("dom").trigger("add")
       assert_equal(
         ["NewPortland", "added"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger("submit")
+      ui.c("dom").trigger("submit")
       assert_equal(["NewPortland", "added"], StateRepo.saved.cities.map(&:name))
     end
 
     def test_can_render
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(name: "city")
           id { record.name }
           accessor(:name)
 
-          render(:dom) do |c|
+          render_to(:dom) do |c|
             c.div(
               value: facet.name,
               update: c.f(
@@ -273,10 +273,10 @@ module Interfacets
         end
 
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include StateFacet
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             facet.cities.map { _1.render("dom", c) }
           end
 
@@ -292,25 +292,25 @@ module Interfacets
       )
       assert_equal(
         ["Portland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger({ update: "Portland" })
+      ui.c("dom").trigger({ update: "Portland" })
       assert_equal(
         ["NewPortland", "Salem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger({ update: "Salem" })
+      ui.c("dom").trigger({ update: "Salem" })
       assert_equal(
         ["NewPortland", "NewSalem"],
-        browser.c("dom").css("div").map { _1.attr("value") },
+        ui.c("dom").css("div").map { _1.attr("value") },
       )
     end
 
     def test_can_bind_attribute
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(
             name: "city",
             binds: [:some_var, :state_name],
@@ -319,7 +319,7 @@ module Interfacets
           id { record.name }
           accessor(:name)
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             c.d1(
               value: facet.some_var,
               update: c.f(
@@ -338,10 +338,10 @@ module Interfacets
         end
 
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include StateFacet
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             facet.cities.map { _1.render("dom", c) }
             c.StateName(value: facet.name)
           end
@@ -371,31 +371,31 @@ module Interfacets
       )
       assert_equal(
         ["some_var", "some_var"],
-        browser.c("dom").css("d1").map { _1.attr("value") },
+        ui.c("dom").css("d1").map { _1.attr("value") },
       )
       assert_equal(
         ["Oregon", "Oregon"],
-        browser.c("dom").css("d2").map { _1.attr("value") },
+        ui.c("dom").css("d2").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger({ update_some_var: "Portland" })
+      ui.c("dom").trigger({ update_some_var: "Portland" })
       assert_equal(
         ["Newsome_var", "Newsome_var"],
-        browser.c("dom").css("d1").map { _1.attr("value") },
+        ui.c("dom").css("d1").map { _1.attr("value") },
       )
       assert_equal(
         ["Oregon", "Oregon"],
-        browser.c("dom").css("d2").map { _1.attr("value") },
+        ui.c("dom").css("d2").map { _1.attr("value") },
       )
 
-      browser.c("dom").trigger({ update_state_name: "Salem" })
+      ui.c("dom").trigger({ update_state_name: "Salem" })
       assert_equal(
         ["Newsome_var", "Newsome_var"],
-        browser.c("dom").css("d1").map { _1.attr("value") },
+        ui.c("dom").css("d1").map { _1.attr("value") },
       )
       assert_equal(
         ["NewOregon", "NewOregon"],
-        browser.c("dom").css("d2").map { _1.attr("value") },
+        ui.c("dom").css("d2").map { _1.attr("value") },
       )
     end
   end

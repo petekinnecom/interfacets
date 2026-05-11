@@ -1,93 +1,45 @@
 # frozen_string_literal: true
 
 require_relative "./test_helper"
+require_relative "./fixtures/test_facet"
 
 require "logger"
 
 module Interfacets
   class FacetMrubyTest < InterfacetsTest
-
-    Person = Struct.new(:id, :name, :saved)
-
-    class TestFacet
-      include Interfacets::Server::Facet
-      include Interfacets::Server::BasicRoutable
-
-      class << self
-        attr_accessor :db
-      end
-
-      view do |person|
-        render(:url) do |c|
-          c.path(person.api_path)
-        end
-
-        render(:dom) do |c|
-          c.div(onClick: ->(e) { person.name = "clicked" }) do
-            c.str(person.name)
-          end
-
-          c.button("save", onClick: -> { person.save })
-        end
-      end
-
-      client_entity do
-        role("client")
-      end
-
-      entity_base do
-        accessor(:id, accepted_by: :client)
-        accessor(:name)
-
-        server_action(:save)
-      end
-
-      server_entity do
-        find do |id, query:|
-          build(self, TestFacet.db.fetch(id))
-        end
-
-        def save
-          store.saved = true
-        end
-      end
-    end
-
     def setup
       super
-      @db = { "1" => Person.new(id: "1", name: "name_value") }
-      TestFacet.db = @db
+      @db = { "1" => Interfacets::Test::Person.new(id: "1", name: "name_value") }
+      Interfacets::Test::TestFacet.db = @db
     end
 
     def test_data_flow
       server_bus = Server::Bus.new(
         root_url: "root_url",
-        asset_paths: [],
-        facets: [TestFacet],
-        build_dir: "./tmp/build"
+        asset_paths: [File.expand_path("./fixtures", __dir__)],
       )
 
       router = Server::BasicRouter.new(
         bus: server_bus,
         paths: {
-          "/person" => TestFacet
+          "/person" => Interfacets::Test::TestFacet
         }
       )
 
-      browser = Test::Browser.new(
-        system_json: H.j(server_bus.client_system_json),
-        router:,
+      ui = Test::UiSimulator.new(
+        bus: server_bus,
+        router: router,
         type: :nodo,
       )
 
-      browser.visit("/person/1")
-      assert_equal "name_value", browser.dom.one("div").content
-      browser.dom.one("div").trigger("onClick")
-      assert_equal "clicked", browser.dom.one("div").content
+      ui.visit("/person/1")
+      assert_equal "name_value", ui.dom.one("div").content
+      ui.dom.one("div").trigger("onClick")
+      assert_equal "clicked", ui.dom.one("div").content
 
-      browser.dom.one("button").trigger("onClick")
+      ui.dom.one("button").trigger("onClick")
       assert @db.fetch("1").saved
-      assert_equal "root_url/person/1", browser.url.url
+      assert_equal "root_url/person/1", ui.url.url
     end
   end
 end

@@ -8,9 +8,10 @@ module Interfacets
     module Js
       module Receivers
         class React
-          attr_reader :name, :node
-          def initialize(name:)
+          attr_reader :name, :node, :validation_engine
+          def initialize(name:, validation_engine: nil)
             @name = name
+            @validation_engine = validation_engine
             @actions = {}
           end
 
@@ -18,7 +19,7 @@ module Interfacets
             @dispatch = dispatch
             @actions = nil
             @node&.stale!
-            @node = Node.parse(json: payload, dispatch:)
+            @node = Node.parse(json: payload, dispatch:, validation_engine:)
           end
 
           def handler

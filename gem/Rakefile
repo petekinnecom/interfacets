@@ -5,6 +5,10 @@ require "minitest/test_task"
 
 Minitest::TestTask.create do |t|
   t.warning = false
+  t.test_globs = (
+    Rake::FileList["test/**/test_*.rb", "test/**/*_test.rb"]
+    .exclude("test/fixtures/**/*")
+  )
 end
 
 task default: :test

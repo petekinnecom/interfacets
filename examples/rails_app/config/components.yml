@@ -1,0 +1,29 @@
+Button:
+  js:
+    path: "../components/Button"
+    default: true
+  props:
+    label:
+      type: string
+    onClick:
+      is_event: true
+      payload:
+        type: object
+
+textarea:
+  props:
+    id:
+      type: string
+    defaultValue:
+      type: [string, "null"]
+    value:
+      type: [string, "null"]
+    onChange:
+      is_event: true
+      transform:
+        value: [0, "target", "value"]
+      payload:
+        type: object
+        properties:
+          value: { type: string }
+        required: [value]

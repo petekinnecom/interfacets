@@ -5,8 +5,9 @@
 - Collections and Associations
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)
 
 <br/>
 
@@ -33,7 +34,7 @@ class Address < ApplicationRecord
 end
 
 view do |person|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.p("Hello, #{person.name}")
 
     if person.address
@@ -87,7 +88,7 @@ class PhoneNumber
 end
 
 view do |person|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.p("Hello #{person.name}")
 
     person.phone_numbers.each do |phone_number|
@@ -328,5 +329,6 @@ end
 - Collections and Associations
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)

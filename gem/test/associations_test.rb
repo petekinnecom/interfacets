@@ -30,7 +30,7 @@ module Interfacets
 
         id { record.name }
 
-        render("dom") do |c|
+        render_to("dom") do |c|
           c.div(
             value: facet.state.name,
             update: c.f(
@@ -44,10 +44,10 @@ module Interfacets
 
     def test_explicit_and_nested
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include CityFacet
 
-          association(:state) do
+          reference(:state) do
             read { record.state }
 
             nested do
@@ -73,21 +73,21 @@ module Interfacets
       )
       assert_equal(
         "Oregon",
-        browser.c("dom").at_css("div").attr("value"),
+        ui.c("dom").at_css("div").attr("value"),
       )
-      browser.c("dom").trigger(:update)
+      ui.c("dom").trigger(:update)
       assert_equal(
         "NewOregon",
-        browser.c("dom").at_css("div").attr("value"),
+        ui.c("dom").at_css("div").attr("value"),
       )
     end
 
     def test_implicit_read
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include CityFacet
 
-          association(:state) do
+          reference(:state) do
             nested do
               id { record.name }
 
@@ -104,14 +104,14 @@ module Interfacets
 
     def test_non_nested_class
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(name: "state")
           id { record.name }
           accessor(:name)
         end
 
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include CityFacet
 
           association(:state, state_facet)
@@ -125,12 +125,12 @@ module Interfacets
 
     def test_can_render
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(name: "state")
           id { record.name }
           accessor(:name)
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             c.div(
               value: facet.name,
               update: c.f(
@@ -142,10 +142,10 @@ module Interfacets
         end
 
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include CityFacet
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             facet.state.render("dom", c)
           end
 
@@ -159,18 +159,18 @@ module Interfacets
       )
       assert_equal(
         "Oregon",
-        browser.c("dom").at_css("div").attr("value"),
+        ui.c("dom").at_css("div").attr("value"),
       )
-      browser.c("dom").trigger(:update)
+      ui.c("dom").trigger(:update)
       assert_equal(
         "NewOregon",
-        browser.c("dom").at_css("div").attr("value"),
+        ui.c("dom").at_css("div").attr("value"),
       )
     end
 
     def test_can_bind_attribute
       state_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           config(
             name: "state",
             binds: [:some_var, :city_name],
@@ -178,7 +178,7 @@ module Interfacets
           id { record.name }
           accessor(:name)
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             c.d1(
               value: facet.some_var,
               update: c.f(
@@ -197,10 +197,10 @@ module Interfacets
         end
 
       city_facet =
-        Class.new(Interfacets::Server::Facet) do
+        Class.new(Interfacets::Shared::Facet) do
           include CityFacet
 
-          render("dom") do |c|
+          render_to("dom") do |c|
             facet.state.render("dom", c)
 
             c.CityName(value: facet.name)
@@ -232,26 +232,26 @@ module Interfacets
       )
       assert_equal(
         "some_var",
-        browser.c("dom").at_css("d1").attr("value"),
+        ui.c("dom").at_css("d1").attr("value"),
       )
-      browser.c("dom").trigger(:update_some_var)
+      ui.c("dom").trigger(:update_some_var)
       assert_equal(
         "Newsome_var",
-        browser.c("dom").at_css("d1").attr("value"),
+        ui.c("dom").at_css("d1").attr("value"),
       )
 
       assert_equal(
         "Portland",
-        browser.c("dom").at_css("d2").attr("value"),
+        ui.c("dom").at_css("d2").attr("value"),
       )
-      browser.c("dom").trigger(:update_city_name)
+      ui.c("dom").trigger(:update_city_name)
       assert_equal(
         "NewPortland",
-        browser.c("dom").at_css("d2").attr("value"),
+        ui.c("dom").at_css("d2").attr("value"),
       )
       assert_equal(
         "NewPortland",
-        browser.c("dom").at_css("CityName").attr("value"),
+        ui.c("dom").at_css("CityName").attr("value"),
       )
     end
   end

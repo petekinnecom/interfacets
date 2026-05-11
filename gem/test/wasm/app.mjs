@@ -16,6 +16,7 @@ function handler(channelName) {
 }
 
 export async function init({ clientSystemJson, hydratedFacet }) {
+  for (const key in currentState) delete currentState[key];
   const rubyWorker = await initTestWorker(MRuby)
 
   bus = await initBus({

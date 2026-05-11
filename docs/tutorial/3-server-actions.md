@@ -5,8 +5,9 @@
 - [Collections and Associations](2-collections-and-associations.md)
 - Server Actions
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)
 
 <br/>
 
@@ -35,7 +36,7 @@ An after action is run when the client receives the API response. You can option
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.Spinner if entity.saving
 
     c.button(
@@ -70,7 +71,7 @@ In the following example, we only show the `Person.count` message after a save:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.p(person_count_message) if person_count_message
 
     c.button(onClick: -> { person.save })
@@ -113,7 +114,7 @@ For example, if you want to indicate that a "save" action was unsuccessful due t
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.p(entity.flash_message) if entity.flash_message
     c.button(onClick: -> { entity.save })
   end
@@ -150,7 +151,7 @@ For example:
 client_entity do
   def save
     @saving = true
-    store.save
+    super
   end
 end
 
@@ -168,5 +169,6 @@ end
 - [Collections and Associations](2-collections-and-associations.md)
 - Server Actions
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)

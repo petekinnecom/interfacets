@@ -13,7 +13,11 @@ module Interfacets
         end
 
         def add(k, v)
-          @errors[k] << v
+          @errors[k.to_sym] << v
+        end
+
+        def clear
+          @errors.clear
         end
 
         def [](k)

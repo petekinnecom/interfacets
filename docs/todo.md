@@ -17,4 +17,4 @@
 
 ## Rails reloading
 
-If you set facets: `-> { ApplicationFacet.descendents }`, then the show will work, but if you trigger an action that gets a *new* facet, it will be loaded on the server now, but it will not be in the assets present on the client. So you either need to send it along *OR* list out all your facets in the initializer (ie, eager load them all. :(
+Previously we used a `facets:` argument, but now all facets are loaded from the paths provided in the `asset_paths:` array. If you trigger an action that gets a *new* facet, it will be loaded on the server now, but it will not be in the assets present on the client if it wasn't already bundled. So you either need to send it along *OR* ensure all facet paths are listed in the initializer (ie, eager load them all).

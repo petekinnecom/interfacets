@@ -1,0 +1,12 @@
+props:
+  type: object
+  required: [label]
+  properties:
+    label: { type: string }
+    value: { type: string }
+events:
+  onChange:
+    type: object
+    required: [value]
+    properties:
+      value: { type: string }

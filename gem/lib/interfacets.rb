@@ -26,6 +26,8 @@ module Interfacets
   end
 
   class Error < StandardError; end
+  class ValidationError < Error; end
+  class MissingComponentContractError < Error; end
 end
 
 unless Interfacets.enable_reloading?

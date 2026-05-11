@@ -118,8 +118,8 @@ module Interfacets
 
           serialized[const.full_name] = true
 
-          const.nesting.each do |_nesting_const|
-            push_bootstrapper(const, results, serialized)
+          const.nesting.each do |nesting_const|
+            push_bootstrapper(nesting_const, results, serialized)
           end
 
           parent = (
@@ -145,7 +145,7 @@ module Interfacets
         end
 
         def resolve_const_name(nesting, name)
-          full_name = [nesting, name].compact.join("::")
+          full_name = [nesting, name].compact.reject(&:empty?).join("::")
           return consts_by_name[full_name] if consts_by_name.key?(full_name)
 
           # maybe a constant that we don't handle loading for (eg, StandardError)
@@ -159,7 +159,7 @@ module Interfacets
         end
 
         def fs_map
-          paths.map { [_1, file.read(_1)] }.to_h
+          @fs_map ||= paths.map { [_1, file.read(_1)] }.to_h
         end
 
         def consts
@@ -181,11 +181,17 @@ module Interfacets
       ].freeze
 
       class << self
-        def bundle(dirs:, registry:)
+        def bundle(dirs:, registry:, only_facets: false)
 
-          registry.serialize
+          target_dirs = (
+            if only_facets
+              dirs
+            else
+              GEM_DIRS + dirs
+            end
+          )
 
-          (dirs + GEM_DIRS + [registry.build_dir])
+          target_dirs
             .flat_map { paths(_1) }
             .flatten
             .map(&:to_s)

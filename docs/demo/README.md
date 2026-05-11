@@ -22,14 +22,16 @@ Here's everything you need to build a form. It's just a demo, but if you need a 
 
 ```ruby
 class PersonFacet < ApplicationFacet
+  include Interfacets::Shared::BasicRoutable
+
   view do |person|
     # Control the location bar
-    render(:url) do |url|
+    render_to(:url) do |url|
       url.path("/person/#{person.id}")
     end
 
     # Render to react
-    render(:dom) do |dom|
+    render_to(:dom) do |dom|
       dom.p("Hi #{person.full_name}")
 
       dom.p do

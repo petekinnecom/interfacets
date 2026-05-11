@@ -8,9 +8,9 @@ require_relative "app/facets/hello_facet"
 configure do
   set :server_bus, Interfacets::Server::Bus.new(
     root_url: "http://localhost:4569",
-    asset_paths: [],
-    facets: [HelloFacet],
-    build_dir: File.join(__dir__, "tmp/interfacets")
+    asset_paths: [
+      File.expand_path("app/facets", __dir__),
+    ]
   )
 
   set :router, Interfacets::Server::BasicRouter.new(

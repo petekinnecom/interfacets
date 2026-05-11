@@ -2,11 +2,11 @@ module Facets
   module Users
     class Show < ApplicationFacet
       view do |user|
-        render(:url) do |url|
+        render_to(:url) do |url|
           url.path(user.api_path)
         end
 
-        render(:dom) do |d|
+        render_to(:dom) do |d|
           d.p("User ID: #{user.id.inspect}")
 
           d.div do
@@ -60,8 +60,17 @@ module Facets
           )
 
           d.div do
-            d.button(
-              "Save",
+            d.label("Bio:")
+            d.textarea(
+              id: "user-bio",
+              defaultValue: user.bio,
+              onChange: ->(data) { user.bio = data["value"] }
+            )
+          end
+
+          d.div do
+            d.Button(
+              label: "Save",
               onClick: -> { user.save }
             )
           end
@@ -74,6 +83,7 @@ module Facets
       entity_base do
         accessor(:id, accepted_by: :client)
         accessor(:name)
+        accessor(:bio)
 
         reference(:address) do
           accessor(:id, accepted_by: :client)

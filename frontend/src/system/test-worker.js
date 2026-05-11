@@ -13,7 +13,11 @@ export async function init(mrubyMod) {
     },
   }
   const workerBus = {
-    postMessage: (event) => { mainBus.onmessage({ data: event }) }
+    postMessage: (event) => {
+      if (mainBus.onmessage) {
+        mainBus.onmessage({ data: event })
+      }
+    }
   }
   const inlineHandler = handler(mrubyMod, workerBus)
 

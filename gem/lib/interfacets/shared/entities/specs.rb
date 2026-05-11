@@ -72,6 +72,7 @@ module Interfacets
             :builder,
             :parent,
             :identifier,
+            :type,
           )
           def initialize(parent:, name:)
             @parent = parent
@@ -81,6 +82,7 @@ module Interfacets
             @setter = ->(val) { store.send("#{name}=", val) }
             @builder = ->() { store.association(name).build }
             @identifier = "id"
+
             @klass = Class.new(Entity) do
               define_singleton_method(:name) { "#{parent.name}.#{name}" }
             end
@@ -92,6 +94,8 @@ module Interfacets
             setter: NOT_PASSED,
             builder: NOT_PASSED,
             identifier: NOT_PASSED,
+            mod: nil,
+            type: NOT_PASSED,
             &block
           )
             @accepted_by = Array(accepted_by).map(&:to_s) unless accepted_by == NOT_PASSED
@@ -99,23 +103,44 @@ module Interfacets
             @setter = setter unless setter == NOT_PASSED
             @builder = builder unless builder == NOT_PASSED
             @identifier = identifier.to_s unless identifier == NOT_PASSED
-            klass.class_exec(&block) if block_given?
-          end
-        end
 
-        class Reference < Association
-          def type = :reference
+            if type && type != NOT_PASSED
+              type = type.to_sym
+              unless [:reference, :collection].include?(type)
+                raise ArgumentError.new("invalid association type: #{type.inspect}")
+              end
+
+              if @type && type != @type
+                raise ArgumentError.new("invalid association cannot change type")
+              end
+
+              @type = type
+            end
+
+            @klass.include(mod) if mod
+
+            @klass.class_exec(&block) if block_given?
+          end
+
+          def dup_for(new_parent)
+            dup.tap do |new_spec|
+              new_spec.instance_variable_set(:@parent, new_parent)
+              new_spec.instance_variable_set(:@klass, Class.new(@klass))
+            end
+          end
 
           def handler(entity)
-            Handlers::Reference.new(entity:, spec: self)
-          end
-        end
+            klass = (
+              if type == :reference
+                Handlers::Reference
+              elsif type == :collection
+                Handlers::Collection
+              else
+                raise "Type was never set for association #{parent.name}.#{name}"
+              end
+            )
 
-        class Collection < Association
-          def type = :collection
-
-          def handler(entity)
-            Handlers::Collection.new(entity:, spec: self)
+            klass.new(entity:, spec: self)
           end
         end
 

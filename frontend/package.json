@@ -1,6 +1,6 @@
 {
   "name": "@petekinnecom/interfacets",
-  "version": "0.9.99",
+  "version": "0.9.999",
   "description": "Node counterpart for interfacets ruby gem",
   "homepage": "https://github.com/petekinnecom/interfacets#readme",
   "bugs": {
@@ -17,15 +17,23 @@
   "exports": {
     ".": "./src/index.js",
     "./core": "./src/core.js",
-    "./test": "./src/test.js"
+    "./test": "./src/test.js",
+    "./withTransform": "./src/interfacets/withTransform.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vitest": "^2.1.8"
   }
 }

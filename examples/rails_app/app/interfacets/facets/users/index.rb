@@ -4,7 +4,7 @@ module Facets
   module Users
     class Index < ApplicationFacet
       view do |list|
-        render(:dom) do |d|
+        render_to(:dom) do |d|
           d.h1("Users")
 
           d.a(

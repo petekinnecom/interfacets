@@ -1,6 +1,10 @@
 module Facets
   class ApplicationFacet
-    include Interfacets::Server::Facet
-    include Interfacets::Server::BasicRoutable
+    include Interfacets::Shared::Facet
+
+    # Make all facets routable:
+    def self.inherited(mod)
+      mod.include(Interfacets::Shared::BasicRoutable)
+    end
   end
 end

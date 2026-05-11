@@ -23,18 +23,19 @@ module Interfacets
           current_mod = ""
           mods.each do |mod_name|
             current_mod += "::#{mod_name}"
-            type = current_mod.constantize.is_a?(Module) ? :module : :class
+            type = current_mod.constantize.is_a?(Class) ? :class : :module
             headers << "#{type} #{mod_name}"
             footers << "end"
           end
 
-          headers << "class #{klass_name} < Interfacets::Client::Facet"
+          headers << "class #{klass_name}"
+          headers << "  include Interfacets::Shared::Facet"
           footers << "end"
 
           <<~TXT
             #{headers.join("\n")}
 
-              include Interfacets::Client::Facets::Schema
+              include Interfacets::Shared::Facets::Schema
 
               view_spec #{write_source(klass.client_config.view.block)}
 

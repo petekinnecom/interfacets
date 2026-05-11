@@ -36,7 +36,7 @@ module Interfacets
           .values
           .map { Object.const_get(_1) }
           .then {
-            Interfacets::Server::Facets::Schema::Serializer
+            Interfacets::Shared::Facets::Schema::Serializer
               .call(facets: _1)
           }
       end

@@ -12,7 +12,8 @@ export const connect = async ({
   await init({
     rubyWorker,
     clientSystemJson,
-    logLevel
+    logLevel,
+    force: true
   })
 
   system.buses[id] = { id, channels: channels };

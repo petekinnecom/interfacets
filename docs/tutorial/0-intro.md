@@ -5,8 +5,9 @@
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)
 
 <br/>
 
@@ -22,11 +23,11 @@ An entity represents the state and behavior of the the facet. The entity exists 
 
 ## Creating a Basic Facet
 
-To create a facet, you include the `Interfacets::Server::Facet` module in a Ruby class. A facet is divided into several sections:
+To create a facet, you include the `Interfacets::Shared::Facet` module in a Ruby class. A facet is divided into several sections:
 
 - **view**: Defines how the entity is rendered on the client
 - **client**: Client-side behavior and computed properties
-- **shared**: Attributes and methods available on both client and server
+- **entity_base**: Attributes and methods available on both client and server
 - **find**: How to load the server-side record
 - **server**: Server-side behavior
 
@@ -34,10 +35,11 @@ Here's a simple example:
 
 ```ruby
 class PersonFacet
-  include Interfacets::Server::Facet
+  include Interfacets::Shared::Facet
+  include Interfacets::Shared::BasicRoutable
 
   view do |person|
-    render(:dom) do |c|
+    render_to(:dom) do |c|
       c.div do
         c.p(person.greeting)
 
@@ -95,9 +97,9 @@ Let's breakdown the client entity and server entity from the above example. Here
 
 Methods:
 
-- `id`, `id=` stored in memory, from attribute in "shared" block
-- `name`, `name=` stored in memory, from attribute in "shared" block
-- `save`, `after_save` from server action in "shared" block
+- `id`, `id=` stored in memory, from attribute in "entity_base" block
+- `name`, `name=` stored in memory, from attribute in "entity_base" block
+- `save`, `after_save` from server action in "entity_base" block
 - `greeting`, from method definition in client block
 
 These methods are all available to be used in the view. When the `save` method is invoked, the client entity will be serialized and shipped to the backend.
@@ -106,9 +108,9 @@ These methods are all available to be used in the view. When the `save` method i
 
 Methods:
 
-- `id`, `id=` delegated to record, from attribute in "shared" block
-- `name`, `name=` delegated to record, from attribute in "shared" block
-- `save` delegated to record, from server action in "shared" block
+- `id`, `id=` delegated to record, from attribute in "entity_base" block
+- `name`, `name=` delegated to record, from attribute in "entity_base" block
+- `save` delegated to record, from server action in "entity_base" block
 
 
 ## Handling user actions
@@ -119,7 +121,7 @@ Here's how the data flows for the following button:
 
 ```ruby
 view do |entity|
-  render(:dom) do |c|
+  render_to(:dom) do |c|
     c.p("you clicked: #{entity.count} times")
 
     c.button(onClick: -> { entity.count += 1 })
@@ -171,7 +173,7 @@ In Interfacets, data flows in a cycle between server and client:
 
 ## The entity, the view, and ~~Barbara Walters~~ you
 
-Interfacets was primarily built to render to the DOM using React, however, there are other parts of the browser you might want to control. For example, maybe you'd like to write changes to the URL bar. Or perhaps you'd like to be able to play some audio. Maybe you'd like to record some audio (NOT WITHOUT PERMISSION OF COURSE THAT'S ILLEGAL). This can all be done with interfacts.
+Interfacets was primarily built to render to the DOM using React, however, there are other parts of the browser you might want to control. For example, maybe you'd like to write changes to the URL bar. Or perhaps you'd like to be able to play some audio. Maybe you'd like to record some audio (NOT WITHOUT PERMISSION OF COURSE THAT'S ILLEGAL). This can all be done with Interfacets.
 
 When you define your view, you specify which "channel" you are rendering to. Each channel has its own builder object with its own API. Each channel can invoke callbacks in your code, allowing you to update your entity's state.
 
@@ -184,5 +186,6 @@ When you define your view, you specify which "channel" you are rendering to. Eac
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - [Validations](4-validations.md)
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)

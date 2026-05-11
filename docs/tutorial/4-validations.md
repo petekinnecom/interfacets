@@ -5,8 +5,9 @@
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - Validations
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)
 
 <br/>
 
@@ -23,7 +24,7 @@ For example:
 
 ```ruby
 view do |form|
-  render(:dom) do |d|
+  render_to(:dom) do |d|
     # Trigger validations before a render
     form.valid?
 
@@ -109,5 +110,6 @@ It's a work-in-progress...lol.
 - [Collections and Associations](2-collections-and-associations.md)
 - [Server Actions](3-server-actions.md)
 - Validations
-- [Testing](5-testing.md)
-- [Configuring](6-configuring.md)
+- [Mounting](5-mounting.md)
+- [Testing](6-testing.md)
+- [Configuring](7-configuring.md)

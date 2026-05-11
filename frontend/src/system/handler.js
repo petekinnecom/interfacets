@@ -9,8 +9,10 @@ export function handler(mrubyMod, worker) {
     }
 
     if (event.data.type == "interfacets:start") {
+      if (!mruby) {
       mruby = await mrubyMod["default"]()
       logger.debug("worker started")
+      }
       worker.postMessage({ type: "interfacets:started" })
     }
     else if (event.data.type == "interfacets:eval") {

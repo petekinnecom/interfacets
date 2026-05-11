@@ -1,0 +1,13 @@
+# Ignore dependencies
+node_modules/
+
+# Ignore test files
+test/
+tests/
+test.js
+
+# Ignore logs
+*.log
+
+# Ignore OS-specific files
+.DS_Store

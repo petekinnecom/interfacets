@@ -10,12 +10,8 @@ module Interfacets
         end
 
         def call(klass:, id:, query:, resolved_path:)
-          klass.bus = bus
-
-          bus.registry.ensure_registered(klass)
-
-          klass
-            .find(id, query:)
+          klass.server_entity_class
+            .find_for_basic_routing(id, query:, bus: bus)
             .tap { _1.entity.api_path = resolved_path }
         end
       end

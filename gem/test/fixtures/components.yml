@@ -1,0 +1,91 @@
+# Example Component Registry Contract
+
+definitions:
+  common_props:
+    type: object
+    properties:
+      id: { type: string }
+      className: { type: string }
+      style: { type: object }
+
+TextField:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+    label: { type: string }
+    value: { type: string }
+    placeholder: { type: string }
+    disabled: { type: boolean }
+    onChange:
+      is_event: true
+      payload:
+        type: object
+        required: [value]
+        properties:
+          value: { type: string }
+    onFocus:
+      is_event: true
+      payload:
+        type: object
+
+Button:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+    type: { enum: [button, submit, reset] }
+    variant: { enum: [primary, secondary, danger, ghost] }
+    disabled: { type: boolean }
+    onClick:
+      is_event: true
+      payload:
+        type: object
+
+button:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+    onClick:
+      is_event: true
+      payload: { type: object }
+
+input:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+    value: { type: string }
+    type: { type: string }
+    onChange:
+      is_event: true
+      payload:
+        type: object
+        properties:
+          value: { type: string }
+
+div:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+    onClick:
+      is_event: true
+      payload: { type: object }
+
+span:
+  props:
+    id: { type: string }
+    className: { type: string }
+    style: { type: object }
+
+EventComponent:
+  props:
+    onComplexAction:
+      is_event: true
+      schema:
+        type: object
+        required: [id]
+        properties:
+          id: { type: integer }

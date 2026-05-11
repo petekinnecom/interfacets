@@ -68,6 +68,8 @@ class Bus
 
     data = {}
 
+    data[:errors] = entity.errors.to_h if entity.respond_to?(:errors)
+
     manifest
       .accessors
       .each do |name, spec|
@@ -98,6 +100,13 @@ class Bus
   end
 
   def merge(manifest:, entity:, attributes:, action:)
+    if (errs = attributes[:errors] || attributes["errors"])
+      entity.errors.clear if entity.errors.respond_to?(:clear)
+      errs.each do |k, vs|
+        Array(vs).each { |v| entity.errors.add(k.to_sym, v) }
+      end
+    end
+
     manifest
       .accessors
       .values
@@ -139,9 +148,9 @@ class Bus
           .association(association.name)
           .get
           .then { _1 || entity.association(association.name).build }
-          .tap {
+          .tap { |nested_entity|
             merge(
-              entity: _1,
+              entity: nested_entity,
               manifest: association.klass,
               attributes: value,
               action:

@@ -8,9 +8,8 @@ Rails.configuration.to_prepare do
       asset_paths: [
         Rails.root.join("app/interfacets/shared"),
         Rails.root.join("app/interfacets/client"),
+        Rails.root.join("app/facets"),
       ],
-      facets: -> { Facets::ApplicationFacet.descendants },
-      build_dir: Rails.root.join("tmp/interfacets")
     )
   )
 
